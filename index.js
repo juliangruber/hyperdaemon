@@ -2,30 +2,38 @@
 
 const { app, Menu, Tray } = require('electron')
 const { start, stop } = require('hyperdrive-daemon/manager')
+const setupFuse = require('./lib/setup-fuse')
 
-if (!app.requestSingleInstanceLock()) {
+if (app.isPackaged && !app.requestSingleInstanceLock()) {
   app.quit()
   process.exit()
 }
 
 let tray
 let daemonRunning = false
+let fuseEnabled = false
 
 const startDaemon = async () => {
-  const { opts } = await start()
   daemonRunning = true
   updateTray()
+
+  const { opts } = await start()
+
+  if (opts.mountpoint) fuseEnabled = true
+  updateTray()
+
   return opts.endpoint
 }
 
 const stopDaemon = async () => {
-  await stop()
   daemonRunning = false
   updateTray()
+  await stop()
 }
 
 const updateTray = () => {
-  const contextMenu = Menu.buildFromTemplate([
+  if (!tray) return
+  const template = [
     {
       label: `Hyperdrive Daemon is ${daemonRunning ? 'ON' : 'OFF'}`,
       enabled: false
@@ -33,8 +41,24 @@ const updateTray = () => {
     daemonRunning
       ? { label: 'Turn OFF', click: stopDaemon }
       : { label: 'Turn ON', click: startDaemon }
-  ])
-  tray.setContextMenu(contextMenu)
+  ]
+  if (daemonRunning) {
+    template.push({ type: 'separator' })
+    if (fuseEnabled) {
+      template.push({ label: 'FUSE enabled', enabled: false })
+    } else {
+      template.push({
+        label: 'Setup FUSE',
+        click: async () => {
+          await setupFuse()
+          fuseEnabled()
+          updateTray()
+        }
+      })
+    }
+  }
+  const menu = Menu.buildFromTemplate(template)
+  tray.setContextMenu(menu)
 }
 
 app.on('ready', () => {
