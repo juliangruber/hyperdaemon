@@ -1,0 +1,17 @@
+{
+  "name": "hyperdrive-daemon-app",
+  "private": true,
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": "hypergraph-xyz/hyperdrive-daemon-app",
+  "scripts": {
+    "start": "nodemon --exec electron index.js",
+    "test": "prettier-standard && standard"
+  },
+  "devDependencies": {
+    "electron": "^8.2.2",
+    "nodemon": "^2.0.3",
+    "prettier-standard": "^16.2.1",
+    "standard": "^14.3.3"
+  }
+}
