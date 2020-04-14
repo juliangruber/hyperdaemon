@@ -23,10 +23,10 @@ app.on('ready', () => {
 })
 
 const main = async () => {
-  await start()
+  const { opts } = await start()
   const n = new Notification({
     title: 'Hyperdrive Daemon',
-    body: 'Daemon started',
+    body: `Daemon listening on ${opts.endpoint}`,
     silent: true
   })
   n.show()
