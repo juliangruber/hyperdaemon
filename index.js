@@ -1,7 +1,7 @@
 'use strict'
 
-const { app, Menu, Tray, Notification } = require('electron')
-const { start } = require('hyperdrive-daemon/manager')
+const { app, Menu, Tray } = require('electron')
+const { start, stop } = require('hyperdrive-daemon/manager')
 
 if (!app.requestSingleInstanceLock()) {
   app.quit()
@@ -9,27 +9,42 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 let tray
+let daemonRunning = false
+
+const startDaemon = async () => {
+  const { opts } = await start()
+  daemonRunning = true
+  updateTray()
+  return opts.endpoint
+}
+
+const stopDaemon = async () => {
+  await stop()
+  daemonRunning = false
+  updateTray()
+}
+
+const updateTray = () => {
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: `Hyperdrive Daemon is ${daemonRunning ? 'ON' : 'OFF'}`,
+      enabled: false
+    },
+    daemonRunning
+      ? { label: 'Turn OFF', click: stopDaemon }
+      : { label: 'Turn ON', click: startDaemon }
+  ])
+  tray.setContextMenu(contextMenu)
+}
 
 app.on('ready', () => {
   tray = new Tray(`${__dirname}/icons/tray@4x.png`)
-  const contextMenu = Menu.buildFromTemplate([
-    { label: 'Item1', type: 'radio' },
-    { label: 'Item2', type: 'radio' },
-    { label: 'Item3', type: 'radio', checked: true },
-    { label: 'Item4', type: 'radio' }
-  ])
   tray.setToolTip('This is my application.')
-  tray.setContextMenu(contextMenu)
+  updateTray()
 })
 
 const main = async () => {
-  const { opts } = await start()
-  const n = new Notification({
-    title: 'Hyperdrive Daemon',
-    body: `Daemon listening on ${opts.endpoint}`,
-    silent: true
-  })
-  n.show()
+  await startDaemon()
 }
 
 main().catch(err => {
