@@ -101,11 +101,7 @@ app.on('ready', () => {
 })
 app.dock.hide()
 
-const main = async () => {
-  await startDaemon()
-}
-
-main().catch(err => {
+startDaemon().catch(err => {
   console.error(err)
   process.exit(1)
 })
