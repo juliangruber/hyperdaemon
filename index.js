@@ -62,10 +62,12 @@ const updateTray = () => {
 }
 
 app.on('ready', () => {
+  app.dock.hide()
   tray = new Tray(`${__dirname}/icons/tray@4x.png`)
   tray.setToolTip('This is my application.')
   updateTray()
 })
+app.dock.hide()
 
 const main = async () => {
   await startDaemon()
