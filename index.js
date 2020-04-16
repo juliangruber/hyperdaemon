@@ -1,8 +1,10 @@
 'use strict'
 
-const { app, Menu, Tray } = require('electron')
-const { start, stop } = require('hyperdrive-daemon/manager')
+const { app, Menu, Tray, Notification } = require('electron')
+const HyperdriveDaemon = require('hyperdrive-daemon')
 const setupFuse = require('./lib/setup-fuse')
+const { HyperdriveClient } = require('hyperdrive-daemon-client')
+const constants = require('hyperdrive-daemon-client/lib/constants')
 
 if (app.isPackaged && !app.requestSingleInstanceLock()) {
   app.quit()
@@ -10,42 +12,70 @@ if (app.isPackaged && !app.requestSingleInstanceLock()) {
 }
 
 let tray
-let daemonRunning = false
+let daemon
+let client
+let daemonStatus = 'starting'
 let fuseEnabled = false
 
+process.once('SIGUSR2', async () => {
+  if (client) client.close()
+  if (daemon) await daemon.stop()
+  process.kill(process.pid, 'SIGUSR2')
+})
+
+const setDaemonStatus = (status, { notify } = {}) => {
+  daemonStatus = status
+  updateTray()
+  if (notify) {
+    const n = new Notification({
+      title: 'Hyperdrive Daemon',
+      body: `Daemon is ${daemonStatus}`,
+      silent: true
+    })
+    n.show()
+  }
+}
+
 const startDaemon = async () => {
-  daemonRunning = true
-  updateTray()
+  setDaemonStatus('starting')
+  daemon = new HyperdriveDaemon({
+    storage: constants.root,
+    metadata: null
+  })
+  await daemon.start()
 
-  const { opts } = await start()
+  setDaemonStatus('connecting')
+  client = new HyperdriveClient()
+  await client.ready()
 
-  if (opts.mountpoint) fuseEnabled = true
-  updateTray()
+  const status = await client.status()
+  if (status.fuseAvailable) fuseEnabled = true
 
-  return opts.endpoint
+  setDaemonStatus('ON', { notify: true })
 }
 
 const stopDaemon = async () => {
-  daemonRunning = false
-  updateTray()
-  await stop()
+  setDaemonStatus('stopping')
+  client.close()
+  await daemon.stop()
+  setDaemonStatus('OFF', { notify: true })
 }
 
 const updateTray = () => {
   if (!tray) return
   const template = [
     {
-      label: `Hyperdrive Daemon is ${daemonRunning ? 'ON' : 'OFF'}`,
+      label: `Hyperdrive Daemon is ${daemonStatus}`,
       enabled: false
     },
-    daemonRunning
+    daemonStatus === 'ON'
       ? { label: 'Turn OFF', click: stopDaemon }
       : { label: 'Turn ON', click: startDaemon }
   ]
-  if (daemonRunning) {
+  if (daemonStatus === 'ON') {
     template.push({ type: 'separator' })
     if (fuseEnabled) {
-      template.push({ label: 'FUSE enabled', enabled: false })
+      template.push({ label: 'FUSE is enabled', enabled: false })
     } else {
       template.push({
         label: 'Setup FUSE',
