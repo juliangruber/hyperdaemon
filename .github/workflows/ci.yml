@@ -1,0 +1,64 @@
+name: CI
+on: push
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Get npm cache directory
+        id: npm-cache
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+      - name: Cache node modules
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.npm-cache.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: npm install
+        run: npm ci
+      - name: npm test
+        run: npm test
+      - name: build and release
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      - name: Read package.json
+        id: package
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: package.json
+      - name: Get version
+        id: version
+        uses: gr2m/get-json-paths-action@v1.0.2
+        with:
+          json: ${{ steps.package.outputs.content }}
+          version: 'version'
+      - name: Get application name
+        id: name
+        uses: gr2m/get-json-paths-action@v1.0.2
+        with:
+          json: ${{ steps.package.outputs.content }}
+          name: 'productName'
+      - name: Archive mac dmg
+        if: startsWith(matrix.os, 'macos')
+        uses: actions/upload-artifact@v1
+        with:
+          name: mac
+          path: dist/${{ steps.name.outputs.name }}-${{ steps.version.outputs.version }}.dmg
+      - name: Archive linux appimage
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: actions/upload-artifact@v1
+        with:
+          name: linux
+          path: dist/${{ steps.name.outputs.name }}-${{ steps.version.outputs.version }}.AppImage
