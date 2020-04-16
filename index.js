@@ -57,6 +57,8 @@ const updateTray = () => {
       })
     }
   }
+  template.push({ type: 'separator' })
+  template.push({ label: 'Quit', click: () => app.quit() })
   const menu = Menu.buildFromTemplate(template)
   tray.setContextMenu(menu)
 }
