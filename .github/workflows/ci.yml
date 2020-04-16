@@ -4,7 +4,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
@@ -17,7 +17,7 @@ jobs:
         run: |
           echo "::set-output name=dir::$(npm config get cache)"
       - name: Cache node modules
-        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'windows')
+        if: startsWith(matrix.os, 'ubuntu')
         uses: actions/cache@v1
         with:
           path: ${{ steps.npm-cache.outputs.dir }}
@@ -56,9 +56,3 @@ jobs:
         with:
           name: linux
           path: dist/Hypergraph-${{ steps.version.outputs.version }}.AppImage
-      - name: Archive windows setup
-        if: startsWith(matrix.os, 'windows')
-        uses: actions/upload-artifact@v1
-        with:
-          name: windows
-          path: dist/Hypergraph Setup ${{ steps.version.outputs.version }}.exe
