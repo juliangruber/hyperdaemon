@@ -20,7 +20,7 @@ let daemonStatus = 'starting'
 let fuseEnabled = false
 const store = new Store()
 
-const openFolder = async () => {
+const openDrives = async () => {
   const realPath = await fs.readlink(`${app.getPath('home')}/Hyperdrive`)
   await shell.openExternal(`file://${realPath}`)
 }
@@ -40,7 +40,7 @@ const setDaemonStatus = (status, { notify } = {}) => {
       body: `Daemon is ${daemonStatus}`,
       silent: true
     })
-    n.on('click', openFolder)
+    n.on('click', openDrives)
     n.show()
   }
 }
@@ -95,7 +95,7 @@ const updateTray = () => {
         }
       })
     }
-    template.push({ label: 'Show hyperdrives', click: openFolder })
+    template.push({ label: 'Open drives', click: openDrives })
   }
   template.push({ type: 'separator' })
   template.push({ label: 'Help', click: showHelp })
