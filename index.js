@@ -6,6 +6,7 @@ const setupFuse = require('./lib/setup-fuse')
 const { HyperdriveClient } = require('hyperdrive-daemon-client')
 const constants = require('hyperdrive-daemon-client/lib/constants')
 const { promises: fs } = require('fs')
+const Store = require('electron-store')
 
 if (app.isPackaged && !app.requestSingleInstanceLock()) {
   app.quit()
@@ -17,10 +18,17 @@ let daemon
 let client
 let daemonStatus = 'starting'
 let fuseEnabled = false
+const store = new Store()
 
 const openFolder = async () => {
   const realPath = await fs.readlink(`${app.getPath('home')}/Hyperdrive`)
   await shell.openExternal(`file://${realPath}`)
+}
+
+const showHelp = async () => {
+  await shell.openExternal(
+    'https://github.com/hypergraph-xyz/hyperdrive-daemon-app/blob/master/README.md#usage'
+  )
 }
 
 const setDaemonStatus = (status, { notify } = {}) => {
@@ -90,16 +98,23 @@ const updateTray = () => {
     template.push({ label: 'Show hyperdrives', click: openFolder })
   }
   template.push({ type: 'separator' })
+  template.push({ label: 'Help', click: showHelp })
+  template.push({ type: 'separator' })
   template.push({ label: 'Quit', click: () => app.quit() })
   const menu = Menu.buildFromTemplate(template)
   tray.setContextMenu(menu)
 }
 
-app.on('ready', () => {
+app.on('ready', async () => {
   app.dock.hide()
   tray = new Tray(`${__dirname}/icons/tray@4x.png`)
   tray.setToolTip('This is my application.')
   updateTray()
+
+  if (!store.get('help-displayed')) {
+    await showHelp()
+    store.set('help-displayed', true)
+  }
 })
 app.dock.hide()
 

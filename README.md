@@ -4,7 +4,9 @@ WIP
 
 ## Usage
 
-You need to have the [`hyperdrive-daemon-client`](https://github.com/andrewosh/hyperdrive-daemon-client) or [`hyperdrive-daemon`](https://github.com/andrewosh/hyperdrive-daemon) node module installed globally, in order to manage your hyperdrives:
+_Thank you for installing the Hyperdrive Daemon app!_
+
+To operate it, you need to have the [`hyperdrive-daemon-client`](https://github.com/andrewosh/hyperdrive-daemon-client) or [`hyperdrive-daemon`](https://github.com/andrewosh/hyperdrive-daemon) node module installed globally:
 
 ```bash
 $ npm install -g hyperdrive-daemon-client
