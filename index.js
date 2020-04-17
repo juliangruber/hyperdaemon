@@ -1,10 +1,11 @@
 'use strict'
 
-const { app, Menu, Tray, Notification } = require('electron')
+const { app, Menu, Tray, Notification, shell } = require('electron')
 const HyperdriveDaemon = require('hyperdrive-daemon')
 const setupFuse = require('./lib/setup-fuse')
 const { HyperdriveClient } = require('hyperdrive-daemon-client')
 const constants = require('hyperdrive-daemon-client/lib/constants')
+const { promises: fs } = require('fs')
 
 if (app.isPackaged && !app.requestSingleInstanceLock()) {
   app.quit()
@@ -17,11 +18,10 @@ let client
 let daemonStatus = 'starting'
 let fuseEnabled = false
 
-process.once('SIGUSR2', async () => {
-  if (client) client.close()
-  if (daemon) await daemon.stop()
-  process.kill(process.pid, 'SIGUSR2')
-})
+const openFolder = async () => {
+  const realPath = await fs.readlink(`${app.getPath('home')}/Hyperdrive`)
+  await shell.openExternal(`file://${realPath}`)
+}
 
 const setDaemonStatus = (status, { notify } = {}) => {
   daemonStatus = status
@@ -32,6 +32,7 @@ const setDaemonStatus = (status, { notify } = {}) => {
       body: `Daemon is ${daemonStatus}`,
       silent: true
     })
+    n.on('click', openFolder)
     n.show()
   }
 }
@@ -86,6 +87,7 @@ const updateTray = () => {
         }
       })
     }
+    template.push({ label: 'Show hyperdrives', click: openFolder })
   }
   template.push({ type: 'separator' })
   template.push({ label: 'Quit', click: () => app.quit() })
@@ -101,7 +103,17 @@ app.on('ready', () => {
 })
 app.dock.hide()
 
-startDaemon().catch(err => {
+process.once('SIGUSR2', async () => {
+  if (client) client.close()
+  if (daemon) await daemon.stop()
+  process.kill(process.pid, 'SIGUSR2')
+})
+
+const main = async () => {
+  await startDaemon()
+}
+
+main().catch(err => {
   console.error(err)
   process.exit(1)
 })
