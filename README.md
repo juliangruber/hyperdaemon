@@ -1,6 +1,6 @@
 # hyperdrive-daemon-app
 
-WIP
+Menu bar app for hyperdrive-daemon.
 
 ## Usage
 
