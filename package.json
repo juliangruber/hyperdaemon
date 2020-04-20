@@ -32,6 +32,9 @@
       "extendInfo": {
         "LSUIElement": 1
       }
+    },
+    "linux": {
+      "target": "AppImage"
     }
   }
 }
