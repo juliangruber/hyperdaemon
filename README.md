@@ -24,3 +24,5 @@ $ hyperdrive create ~/Hyperdrive/my-drive
 ```
 
 For more commands, see the [hyperdrive-daemon README](https://github.com/andrewosh/hyperdrive-daemon#cli).
+
+Turn on `Launch at Login` from the tray menu if you want to have your Hyperdrives available at all times.
