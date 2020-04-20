@@ -93,8 +93,8 @@ const updateTray = () => {
         label: 'Setup FUSE',
         click: async () => {
           await setupFuse()
-          fuseEnabled()
-          updateTray()
+          stopDaemon()
+          startDaemon()
         }
       })
     }
