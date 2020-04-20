@@ -60,28 +60,28 @@ const startDaemon = async () => {
   const status = await client.status()
   if (status.fuseAvailable) fuseEnabled = true
 
-  setDaemonStatus('ON', { notify: true })
+  setDaemonStatus('On', { notify: true })
 }
 
 const stopDaemon = async () => {
   setDaemonStatus('stopping')
   client.close()
   await daemon.stop()
-  setDaemonStatus('OFF', { notify: true })
+  setDaemonStatus('Off', { notify: true })
 }
 
 const updateTray = () => {
   if (!tray) return
   const template = [
     {
-      label: `Hyperdrive Daemon is ${daemonStatus}`,
+      label: `Hyperdrive Daemon: ${daemonStatus}`,
       enabled: false
     },
-    daemonStatus === 'ON'
-      ? { label: 'Turn OFF', click: stopDaemon }
-      : { label: 'Turn ON', click: startDaemon }
+    daemonStatus === 'On'
+      ? { label: 'Turn Daemon Off', click: stopDaemon }
+      : { label: 'Turn Daemon On', click: startDaemon }
   ]
-  if (daemonStatus === 'ON') {
+  if (daemonStatus === 'On') {
     template.push({ type: 'separator' })
     if (fuseEnabled) {
       template.push({ label: 'FUSE is enabled', enabled: false })
@@ -97,6 +97,17 @@ const updateTray = () => {
     }
     template.push({ label: 'Open drives', click: openDrives })
   }
+  template.push({ type: 'separator' })
+  template.push({
+    type: 'checkbox',
+    label: 'Launch on Login',
+    checked: app.getLoginItemSettings().openAtLogin,
+    click: () => {
+      app.setLoginItemSettings({
+        openAtLogin: !app.getLoginItemSettings().openAtLogin
+      })
+    }
+  })
   template.push({ type: 'separator' })
   template.push({ label: 'Help', click: showHelp })
   template.push({ type: 'separator' })
