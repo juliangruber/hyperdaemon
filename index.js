@@ -98,7 +98,7 @@ const updateTray = () => {
         }
       })
     }
-    template.push({ label: 'Open drives', click: openDrives })
+    template.push({ label: 'Open Drives', click: openDrives })
   }
   template.push({ type: 'separator' })
   template.push({
