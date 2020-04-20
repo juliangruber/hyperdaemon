@@ -7,6 +7,9 @@ const { HyperdriveClient } = require('hyperdrive-daemon-client')
 const constants = require('hyperdrive-daemon-client/lib/constants')
 const { promises: fs } = require('fs')
 const Store = require('electron-store')
+const unhandled = require('electron-unhandled')
+
+unhandled()
 
 if (app.isPackaged && !app.requestSingleInstanceLock()) {
   app.quit()
