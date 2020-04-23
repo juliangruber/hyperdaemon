@@ -26,3 +26,7 @@ $ hyperdrive create ~/Hyperdrive/my-drive
 For more commands, see the [hyperdrive-daemon README](https://github.com/andrewosh/hyperdrive-daemon#cli).
 
 Turn on `Launch at Login` from the tray menu if you want to have your Hyperdrives available at all times.
+
+## Glossary
+
+If you're interested in learning more about our terminology, the [Hypergraph glossary](https://www.notion.so/Glossary-d4bdf18fb4624c049c7a2663559ef5ad) explains many of the terms we use across Hypergraph products and documentation.
