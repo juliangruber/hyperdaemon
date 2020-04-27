@@ -1,10 +1,10 @@
-# hyperdrive-daemon-app
+# Hyper Daemon
 
 Menu bar app for hyperdrive-daemon.
 
 ## Usage
 
-_Thank you for installing the Hyperdrive Daemon app!_
+_Thank you for installing the Hyper Daemon app!_
 
 To operate it, you need to have the [`hyperdrive-daemon-client`](https://github.com/andrewosh/hyperdrive-daemon-client) or [`hyperdrive-daemon`](https://github.com/andrewosh/hyperdrive-daemon) node module installed globally:
 
