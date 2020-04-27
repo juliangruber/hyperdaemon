@@ -39,7 +39,7 @@ const setDaemonStatus = (status, { notify } = {}) => {
   updateTray()
   if (notify) {
     const n = new Notification({
-      title: 'Hyperdrive Daemon',
+      title: 'Hyper Daemon',
       body: `Daemon is ${daemonStatus}`,
       silent: true
     })
@@ -77,7 +77,7 @@ const updateTray = () => {
   if (!tray) return
   const template = [
     {
-      label: `Hyperdrive Daemon: ${daemonStatus}`,
+      label: `Hyper Daemon: ${daemonStatus}`,
       enabled: false
     },
     daemonStatus === 'On'
