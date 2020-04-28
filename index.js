@@ -82,6 +82,7 @@ const stopDaemon = async () => {
 
 const updateTray = () => {
   if (!tray) return
+  tray.setImage(getTrayImagePath())
   const template = [
     {
       label: `Hyper Daemon: ${daemonStatus}`,
@@ -126,10 +127,15 @@ const updateTray = () => {
   tray.setContextMenu(menu)
 }
 
+const getTrayImagePath = () => {
+  const folder = systemPreferences.isDarkMode() ? 'dark' : 'light'
+  const file = daemonStatus === 'On' ? 'enabled' : 'disabled'
+  return `${__dirname}/build/tray/${folder}/${file}@4x.png`
+}
+
 app.on('ready', async () => {
   app.dock.hide()
-  const folder = systemPreferences.isDarkMode() ? 'dark' : 'light'
-  tray = new Tray(`${__dirname}/build/tray/${folder}/enabled@4x.png`)
+  tray = new Tray(getTrayImagePath())
   tray.setToolTip('This is my application.')
   updateTray()
 
