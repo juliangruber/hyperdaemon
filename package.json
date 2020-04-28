@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "electron": "^7.1.1",
-    "electron-builder": "^22.4.1",
+    "electron-builder": "^21.2.0",
     "nodemon": "^2.0.3",
     "np": "^6.2.1",
     "prettier-standard": "^16.2.1",
@@ -33,6 +33,28 @@
       "extendInfo": {
         "LSUIElement": 1
       }
+    },
+    "dmg": {
+      "window": {
+        "width": "416",
+        "height": "200"
+      },
+      "iconSize": "64",
+      "contents": [
+        {
+          "x": 100,
+          "y": 100,
+          "type": "file",
+          "name": ""
+        },
+        {
+          "x": 320,
+          "y": 100,
+          "type": "link",
+          "path": "/Applications",
+          "name": ""
+        }
+      ]
     },
     "linux": {
       "target": "AppImage"
