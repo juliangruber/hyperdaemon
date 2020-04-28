@@ -31,7 +31,7 @@
   "build": {
     "files": [
       "**/*",
-      "build/tray*"
+      "build/tray/**/*"
     ],
     "mac": {
       "extendInfo": {

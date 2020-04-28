@@ -1,6 +1,13 @@
 'use strict'
 
-const { app, Menu, Tray, Notification, shell } = require('electron')
+const {
+  app,
+  Menu,
+  Tray,
+  Notification,
+  shell,
+  systemPreferences
+} = require('electron')
 const HyperdriveDaemon = require('hyperdrive-daemon')
 const setupFuse = require('./lib/setup-fuse')
 const { HyperdriveClient } = require('hyperdrive-daemon-client')
@@ -121,7 +128,8 @@ const updateTray = () => {
 
 app.on('ready', async () => {
   app.dock.hide()
-  tray = new Tray(`${__dirname}/build/tray@4x.png`)
+  const folder = systemPreferences.isDarkMode() ? 'dark' : 'light'
+  tray = new Tray(`${__dirname}/build/tray/${folder}/enabled@4x.png`)
   tray.setToolTip('This is my application.')
   updateTray()
 
