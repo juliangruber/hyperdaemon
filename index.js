@@ -121,7 +121,7 @@ const updateTray = () => {
 
 app.on('ready', async () => {
   app.dock.hide()
-  tray = new Tray(`${__dirname}/icons/tray@4x.png`)
+  tray = new Tray(`${__dirname}/build/tray@4x.png`)
   tray.setToolTip('This is my application.')
   updateTray()
 

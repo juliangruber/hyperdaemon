@@ -29,6 +29,10 @@
     "sudo-prompt": "^9.1.1"
   },
   "build": {
+    "files": [
+      "**/*",
+      "build/tray*"
+    ],
     "mac": {
       "extendInfo": {
         "LSUIElement": 1
