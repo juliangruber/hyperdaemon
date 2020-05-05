@@ -26,7 +26,7 @@ if (app.isPackaged && !app.requestSingleInstanceLock()) {
 let tray
 let daemon
 let client
-let daemonStatus = 'starting'
+let daemonStatus = 'Off'
 let fuseEnabled = false
 const store = new Store()
 
@@ -52,6 +52,17 @@ const setDaemonStatus = (status, { notify } = {}) => {
     })
     n.on('click', openDrives)
     n.show()
+  }
+}
+
+const isDaemonRunning = async () => {
+  client = new HyperdriveClient()
+  try {
+    await client.ready()
+    setDaemonStatus('On')
+    return true
+  } catch (_) {
+    return false
   }
 }
 
@@ -153,7 +164,7 @@ process.once('SIGUSR2', async () => {
 })
 
 const main = async () => {
-  await startDaemon()
+  if (!(await isDaemonRunning())) await startDaemon()
 }
 
 main().catch(err => {
