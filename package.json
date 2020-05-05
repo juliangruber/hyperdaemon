@@ -15,6 +15,7 @@
   "devDependencies": {
     "electron": "^7.1.1",
     "electron-builder": "^21.2.0",
+    "electron-builder-notarize": "^1.1.2",
     "nodemon": "^2.0.3",
     "np": "^6.2.1",
     "prettier-standard": "^16.2.1",
@@ -33,10 +34,12 @@
       "**/*",
       "build/tray/**/*"
     ],
+    "afterSign": "electron-builder-notarize",
     "mac": {
       "extendInfo": {
         "LSUIElement": 1
-      }
+      },
+      "hardenedRuntime": true
     },
     "dmg": {
       "window": {
