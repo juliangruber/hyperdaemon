@@ -34,7 +34,7 @@
       "**/*",
       "build/tray/**/*"
     ],
-    "afterSign": "electron-builder-notarize",
+    "afterSign": "codesign -dv --verbose=4 dist/mac/Hyper\\ Daemon.app/Contents/Resources/app.asar.unpacked/node_modules/fuse-shared-library-darwin/osxfuse/osxfuse.fs/Contents/Extensions/10.11/osxfuse.kext/Contents/MacOS/osxfuse && electron-builder-notarize",
     "mac": {
       "extendInfo": {
         "LSUIElement": 1
