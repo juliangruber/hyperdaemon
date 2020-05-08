@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "psobrakseaton",
+      "name": "Patch Sobrak-Seaton",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/28573875?v=4",
+      "profile": "https://twitter.com/psobrakseaton",
+      "contributions": [
+        "design"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "hyperdaemon",
+  "projectOwner": "libscie",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
