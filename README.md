@@ -44,6 +44,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://twitter.com/psobrakseaton"><img src="https://avatars3.githubusercontent.com/u/28573875?v=4" width="100px;" alt=""/><br /><sub><b>Patch Sobrak-Seaton</b></sub></a><br /><a href="#design-psobrakseaton" title="Design">🎨</a></td>
+    <td align="center"><a href="http://twitter.com/juliangruber/"><img src="https://avatars2.githubusercontent.com/u/10247?v=4" width="100px;" alt=""/><br /><sub><b>Julian Gruber</b></sub></a><br /><a href="#maintenance-juliangruber" title="Maintenance">🚧</a> <a href="https://github.com/libscie/hyperdaemon/commits?author=juliangruber" title="Code">💻</a> <a href="#design-juliangruber" title="Design">🎨</a> <a href="#ideas-juliangruber" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
