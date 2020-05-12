@@ -1,6 +1,6 @@
 # Contributing to @libscie/hyperdaemon
 
-Welcome! We *love* that you're interested in contributing to Liberate Science :purple_heart:
+Welcome! We _love_ that you're interested in contributing to Liberate Science :purple_heart:
 
 We recognize all our contributors using the [all-contributors](https://github.com/all-contributors/all-contributors) bot. Contributions of any kind welcome!
 
@@ -8,7 +8,7 @@ Come and join us on [Slack](https://join.slack.com/t/libscie/shared_invite/zt-9l
 
 ## Code of conduct
 
-Please note we adhere to a [Code of Conduct](https://github.com/hypergraph-xyz/cli/blob/master/CODE_OF_CONDUCT.md) and any contributions not in line with it (*tl;dr* be an empathetic, considerate person) will not be accepted. Please notify [@chartgerink](mailto:chris@libscie.org) if anything happens.
+Please note we adhere to a [Code of Conduct](https://github.com/hypergraph-xyz/cli/blob/master/CODE_OF_CONDUCT.md) and any contributions not in line with it (_tl;dr_ be an empathetic, considerate person) will not be accepted. Please notify [@chartgerink](mailto:chris@libscie.org) if anything happens.
 
 ## Feature requests & bug reports
 
@@ -55,7 +55,7 @@ $ git checkout -b my-feature-branch -t origin/master
 
 #### Step 3: Test
 
-Bug fixes and features **should come with tests**. 
+Bug fixes and features **should come with tests**.
 
 ```bash
 $ npm test
