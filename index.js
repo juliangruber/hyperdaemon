@@ -8,6 +8,7 @@ const {
   shell,
   systemPreferences
 } = require('electron')
+const manager = require('hyperdrive-daemon/manager')
 const HyperdriveDaemon = require('hyperdrive-daemon')
 const setupFuse = require('./lib/setup-fuse')
 const { HyperdriveClient } = require('hyperdrive-daemon-client')
@@ -15,6 +16,7 @@ const constants = require('hyperdrive-daemon-client/lib/constants')
 const { promises: fs } = require('fs')
 const Store = require('electron-store')
 const unhandled = require('electron-unhandled')
+const sleep = require('yoctodelay')
 
 unhandled()
 
@@ -26,7 +28,7 @@ if (app.isPackaged && !app.requestSingleInstanceLock()) {
 let tray
 let daemon
 let client
-let daemonStatus = 'starting'
+let daemonStatus = 'Off'
 let fuseEnabled = false
 const store = new Store()
 
@@ -41,34 +43,55 @@ const showHelp = async () => {
   )
 }
 
+const connectToDaemon = async () => {
+  client = new HyperdriveClient()
+  await client.ready()
+
+  const status = await client.status()
+  if (status.fuseAvailable) fuseEnabled = true
+
+  setDaemonStatus('On')
+}
+
+const isDaemonRunning = async () => {
+  try {
+    await connectToDaemon()
+    setDaemonStatus('On')
+    return true
+  } catch (_) {
+    setDaemonStatus('Off')
+    return false
+  }
+}
+
 const setDaemonStatus = (status, { notify } = {}) => {
-  daemonStatus = status
-  updateTray()
+  if (status !== daemonStatus) {
+    console.log(status)
+  }
   if (notify) {
     const n = new Notification({
       title: 'Hyper Daemon',
-      body: `Daemon is ${daemonStatus}`,
+      body: `Daemon is ${status}`,
       silent: true
     })
     n.on('click', openDrives)
     n.show()
   }
+
+  daemonStatus = status
+  updateTray()
 }
 
 const startDaemon = async () => {
+  if (await isDaemonRunning()) return
+
   setDaemonStatus('starting')
   daemon = new HyperdriveDaemon({
     storage: constants.root,
     metadata: null
   })
   await daemon.start()
-
-  setDaemonStatus('connecting')
-  client = new HyperdriveClient()
-  await client.ready()
-
-  const status = await client.status()
-  if (status.fuseAvailable) fuseEnabled = true
+  await connectToDaemon()
 
   setDaemonStatus('On', { notify: true })
 }
@@ -76,7 +99,12 @@ const startDaemon = async () => {
 const stopDaemon = async () => {
   setDaemonStatus('stopping')
   client.close()
-  await daemon.stop()
+  if (daemon) {
+    await daemon.stop()
+    daemon = null
+  } else {
+    await manager.stop()
+  }
   setDaemonStatus('Off', { notify: true })
 }
 
@@ -154,6 +182,10 @@ process.once('SIGUSR2', async () => {
 
 const main = async () => {
   await startDaemon()
+  while (true) {
+    await sleep(1000)
+    await isDaemonRunning()
+  }
 }
 
 main().catch(err => {
