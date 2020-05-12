@@ -21,6 +21,7 @@
     "standard": "^14.3.3"
   },
   "dependencies": {
+    "capitalize": "^2.0.3",
     "electron-store": "^5.1.1",
     "electron-unhandled": "^3.0.2",
     "hyperdrive-daemon": "^1.10.3",

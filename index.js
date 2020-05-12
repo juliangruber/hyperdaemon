@@ -17,6 +17,7 @@ const { promises: fs } = require('fs')
 const Store = require('electron-store')
 const unhandled = require('electron-unhandled')
 const sleep = require('yoctodelay')
+const capitalize = require('capitalize')
 
 unhandled()
 
@@ -28,7 +29,7 @@ if (app.isPackaged && !app.requestSingleInstanceLock()) {
 let tray
 let daemon
 let client
-let daemonStatus = 'Off'
+let daemonStatus = 'off'
 let fuseEnabled = false
 const store = new Store()
 
@@ -50,16 +51,16 @@ const connectToDaemon = async () => {
   const status = await client.status()
   if (status.fuseAvailable) fuseEnabled = true
 
-  setDaemonStatus('On')
+  setDaemonStatus('on')
 }
 
 const isDaemonRunning = async () => {
   try {
     await connectToDaemon()
-    setDaemonStatus('On')
+    setDaemonStatus('on')
     return true
   } catch (_) {
-    setDaemonStatus('Off')
+    setDaemonStatus('off')
     return false
   }
 }
@@ -93,7 +94,7 @@ const startDaemon = async () => {
   await daemon.start()
   await connectToDaemon()
 
-  setDaemonStatus('On', { notify: true })
+  setDaemonStatus('on', { notify: true })
 }
 
 const stopDaemon = async () => {
@@ -105,7 +106,7 @@ const stopDaemon = async () => {
   } else {
     await manager.stop()
   }
-  setDaemonStatus('Off', { notify: true })
+  setDaemonStatus('off', { notify: true })
 }
 
 const updateTray = () => {
@@ -113,14 +114,14 @@ const updateTray = () => {
   tray.setImage(getTrayImagePath())
   const template = [
     {
-      label: `Hyper Daemon: ${daemonStatus}`,
+      label: `Hyper Daemon: ${capitalize(daemonStatus)}`,
       enabled: false
     },
-    daemonStatus === 'On'
+    daemonStatus === 'on'
       ? { label: 'Turn Daemon Off', click: stopDaemon }
       : { label: 'Turn Daemon On', click: startDaemon }
   ]
-  if (daemonStatus === 'On') {
+  if (daemonStatus === 'on') {
     template.push({ type: 'separator' })
     if (fuseEnabled) {
       template.push({ label: 'FUSE is enabled', enabled: false })
@@ -157,7 +158,7 @@ const updateTray = () => {
 
 const getTrayImagePath = () => {
   const folder = systemPreferences.isDarkMode() ? 'dark' : 'light'
-  const file = daemonStatus === 'On' ? 'enabled' : 'disabled'
+  const file = daemonStatus === 'on' ? 'enabled' : 'disabled'
   return `${__dirname}/build/tray/${folder}/${file}@4x.png`
 }
 
