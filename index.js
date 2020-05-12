@@ -44,28 +44,28 @@ const showHelp = async () => {
   )
 }
 
-const connectToDaemon = async () => {
+const connect = async () => {
   client = new HyperdriveClient()
   await client.ready()
 
   const status = await client.status()
   if (status.fuseAvailable) fuseEnabled = true
 
-  setDaemonStatus('on')
+  setStatus('on')
 }
 
-const isDaemonRunning = async () => {
+const isRunning = async () => {
   try {
-    await connectToDaemon()
-    setDaemonStatus('on')
+    await connect()
+    setStatus('on')
     return true
   } catch (_) {
-    setDaemonStatus('off')
+    setStatus('off')
     return false
   }
 }
 
-const setDaemonStatus = (status, { notify } = {}) => {
+const setStatus = (status, { notify } = {}) => {
   if (status !== daemonStatus) {
     console.log(status)
   }
@@ -83,22 +83,22 @@ const setDaemonStatus = (status, { notify } = {}) => {
   updateTray()
 }
 
-const startDaemon = async () => {
-  if (await isDaemonRunning()) return
+const start = async () => {
+  if (await isRunning()) return
 
-  setDaemonStatus('starting')
+  setStatus('starting')
   daemon = new HyperdriveDaemon({
     storage: constants.root,
     metadata: null
   })
   await daemon.start()
-  await connectToDaemon()
+  await connect()
 
-  setDaemonStatus('on', { notify: true })
+  setStatus('on', { notify: true })
 }
 
-const stopDaemon = async () => {
-  setDaemonStatus('stopping')
+const stop = async () => {
+  setStatus('stopping')
   client.close()
   if (daemon) {
     await daemon.stop()
@@ -106,7 +106,7 @@ const stopDaemon = async () => {
   } else {
     await manager.stop()
   }
-  setDaemonStatus('off', { notify: true })
+  setStatus('off', { notify: true })
 }
 
 const updateTray = () => {
@@ -118,8 +118,8 @@ const updateTray = () => {
       enabled: false
     },
     daemonStatus === 'on'
-      ? { label: 'Turn Daemon Off', click: stopDaemon }
-      : { label: 'Turn Daemon On', click: startDaemon }
+      ? { label: 'Turn Daemon Off', click: stop }
+      : { label: 'Turn Daemon On', click: start }
   ]
   if (daemonStatus === 'on') {
     template.push({ type: 'separator' })
@@ -130,8 +130,8 @@ const updateTray = () => {
         label: 'Setup FUSE',
         click: async () => {
           await setupFuse()
-          stopDaemon()
-          startDaemon()
+          stop()
+          start()
         }
       })
     }
@@ -182,10 +182,10 @@ process.once('SIGUSR2', async () => {
 })
 
 const main = async () => {
-  await startDaemon()
+  await start()
   while (true) {
     await sleep(1000)
-    await isDaemonRunning()
+    await isRunning()
   }
 }
 
