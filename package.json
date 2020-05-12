@@ -48,13 +48,13 @@
       "contents": [
         {
           "x": 100,
-          "y": 100,
+          "y": 99,
           "type": "file",
           "name": ""
         },
         {
           "x": 320,
-          "y": 100,
+          "y": 99,
           "type": "link",
           "path": "/Applications",
           "name": ""
