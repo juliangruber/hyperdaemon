@@ -175,11 +175,7 @@ process.once('SIGUSR2', async () => {
   process.kill(process.pid, 'SIGUSR2')
 })
 
-const main = async () => {
-  await startDaemon()
-}
-
-main().catch(err => {
+startDaemon().catch(err => {
   console.error(err)
   process.exit(1)
 })
