@@ -16,6 +16,7 @@ const constants = require('hyperdrive-daemon-client/lib/constants')
 const { promises: fs } = require('fs')
 const Store = require('electron-store')
 const unhandled = require('electron-unhandled')
+const sleep = require('yoctodelay')
 
 unhandled()
 
@@ -42,39 +43,43 @@ const showHelp = async () => {
   )
 }
 
-const connect = async () => {
-  setDaemonStatus('connecting')
+const connectToDaemon = async () => {
   client = new HyperdriveClient()
   await client.ready()
-  setDaemonStatus('On')
 
   const status = await client.status()
   if (status.fuseAvailable) fuseEnabled = true
+
+  setDaemonStatus('On')
 }
 
 const isDaemonRunning = async () => {
   try {
-    await connect()
+    await connectToDaemon()
     setDaemonStatus('On')
     return true
   } catch (_) {
-    setDaemonStatus('unreachable')
+    setDaemonStatus('Off')
     return false
   }
 }
 
 const setDaemonStatus = (status, { notify } = {}) => {
-  daemonStatus = status
-  updateTray()
+  if (status !== daemonStatus) {
+    console.log(status)
+  }
   if (notify) {
     const n = new Notification({
       title: 'Hyper Daemon',
-      body: `Daemon is ${daemonStatus}`,
+      body: `Daemon is ${status}`,
       silent: true
     })
     n.on('click', openDrives)
     n.show()
   }
+
+  daemonStatus = status
+  updateTray()
 }
 
 const startDaemon = async () => {
@@ -86,7 +91,7 @@ const startDaemon = async () => {
     metadata: null
   })
   await daemon.start()
-  await connect()
+  await connectToDaemon()
 
   setDaemonStatus('On', { notify: true })
 }
@@ -175,7 +180,15 @@ process.once('SIGUSR2', async () => {
   process.kill(process.pid, 'SIGUSR2')
 })
 
-startDaemon().catch(err => {
+const main = async () => {
+  await startDaemon()
+  while (true) {
+    await sleep(1000)
+    await isDaemonRunning()
+  }
+}
+
+main().catch(err => {
   console.error(err)
   process.exit(1)
 })

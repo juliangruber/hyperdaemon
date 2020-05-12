@@ -26,7 +26,8 @@
     "hyperdrive-daemon": "^1.10.3",
     "hyperdrive-daemon-client": "^1.11.2",
     "hyperdrive-fuse": "^1.2.15",
-    "sudo-prompt": "^9.1.1"
+    "sudo-prompt": "^9.1.1",
+    "yoctodelay": "^1.1.0"
   },
   "build": {
     "files": [
