@@ -8,6 +8,7 @@ const {
   shell,
   systemPreferences
 } = require('electron')
+const manager = require('hyperdrive-daemon/manager')
 const HyperdriveDaemon = require('hyperdrive-daemon')
 const setupFuse = require('./lib/setup-fuse')
 const { HyperdriveClient } = require('hyperdrive-daemon-client')
@@ -41,6 +42,27 @@ const showHelp = async () => {
   )
 }
 
+const connect = async () => {
+  setDaemonStatus('connecting')
+  client = new HyperdriveClient()
+  await client.ready()
+  setDaemonStatus('On')
+
+  const status = await client.status()
+  if (status.fuseAvailable) fuseEnabled = true
+}
+
+const isDaemonRunning = async () => {
+  try {
+    await connect()
+    setDaemonStatus('On')
+    return true
+  } catch (_) {
+    setDaemonStatus('unreachable')
+    return false
+  }
+}
+
 const setDaemonStatus = (status, { notify } = {}) => {
   daemonStatus = status
   updateTray()
@@ -55,31 +77,16 @@ const setDaemonStatus = (status, { notify } = {}) => {
   }
 }
 
-const isDaemonRunning = async () => {
-  client = new HyperdriveClient()
-  try {
-    await client.ready()
-    setDaemonStatus('On')
-    return true
-  } catch (_) {
-    return false
-  }
-}
-
 const startDaemon = async () => {
+  if (await isDaemonRunning()) return
+
   setDaemonStatus('starting')
   daemon = new HyperdriveDaemon({
     storage: constants.root,
     metadata: null
   })
   await daemon.start()
-
-  setDaemonStatus('connecting')
-  client = new HyperdriveClient()
-  await client.ready()
-
-  const status = await client.status()
-  if (status.fuseAvailable) fuseEnabled = true
+  await connect()
 
   setDaemonStatus('On', { notify: true })
 }
@@ -87,7 +94,12 @@ const startDaemon = async () => {
 const stopDaemon = async () => {
   setDaemonStatus('stopping')
   client.close()
-  await daemon.stop()
+  if (daemon) {
+    await daemon.stop()
+    daemon = null
+  } else {
+    await manager.stop()
+  }
   setDaemonStatus('Off', { notify: true })
 }
 
@@ -164,7 +176,7 @@ process.once('SIGUSR2', async () => {
 })
 
 const main = async () => {
-  if (!(await isDaemonRunning())) await startDaemon()
+  await startDaemon()
 }
 
 main().catch(err => {
