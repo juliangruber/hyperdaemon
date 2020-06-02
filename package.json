@@ -13,7 +13,7 @@
     "test": "prettier-standard && standard"
   },
   "devDependencies": {
-    "electron": "^9.0.1",
+    "electron": "^7.3.1",
     "electron-builder": "^21.2.0",
     "electron-builder-notarize": "^1.1.2",
     "nodemon": "^2.0.3",
