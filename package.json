@@ -24,8 +24,8 @@
     "capitalize": "^2.0.3",
     "electron-store": "^5.1.1",
     "electron-unhandled": "^3.0.2",
-    "hyperdrive-daemon": "^1.10.3",
-    "hyperdrive-daemon-client": "^1.11.2",
+    "hyperdrive-daemon": "^1.13.12",
+    "hyperdrive-daemon-client": "^1.15.1",
     "hyperdrive-fuse": "^1.2.15",
     "sudo-prompt": "^9.1.1",
     "yoctodelay": "^1.1.0"
