@@ -13,7 +13,6 @@ const HyperdriveDaemon = require('hyperdrive-daemon')
 const setupFuse = require('./lib/setup-fuse')
 const { HyperdriveClient } = require('hyperdrive-daemon-client')
 const constants = require('hyperdrive-daemon-client/lib/constants')
-const { promises: fs } = require('fs')
 const Store = require('electron-store')
 const unhandled = require('electron-unhandled')
 const sleep = require('yoctodelay')
@@ -35,8 +34,7 @@ let fuseEnabled = false
 const store = new Store()
 
 const openDrives = async () => {
-  const realPath = await fs.readlink(`${app.getPath('home')}/Hyperdrive`)
-  await shell.openExternal(`file://${realPath}`)
+  await shell.openExternal(`file://${app.getPath('home')}/Hyperdrive`)
 }
 
 const showHelp = async () => {
@@ -46,11 +44,8 @@ const showHelp = async () => {
 }
 
 const connect = async () => {
-  debug('connecting')
-
   client = new HyperdriveClient()
   await client.ready()
-  debug('client ready')
 
   const status = await client.status()
   if (status.fuseAvailable) fuseEnabled = true
@@ -59,11 +54,8 @@ const connect = async () => {
 }
 
 const isRunning = async () => {
-  debug('isRunning?')
-
   try {
     await connect()
-    setStatus('on')
     return true
   } catch (_) {
     setStatus('off')
@@ -72,10 +64,8 @@ const isRunning = async () => {
 }
 
 const setStatus = (status, { notify } = {}) => {
-  debug('status %s', status)
-
   if (status !== daemonStatus) {
-    console.log(status)
+    debug('status %s', status)
   }
   if (notify) {
     const n = new Notification({

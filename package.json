@@ -9,7 +9,7 @@
     "dist": "electron-builder",
     "pack": "electron-builder --dir",
     "release": "np --no-publish --no-yarn",
-    "start": "nodemon --exec electron index.js",
+    "start": "DEBUG=hyperdaemon nodemon --exec electron index.js",
     "test": "prettier-standard && standard"
   },
   "devDependencies": {
