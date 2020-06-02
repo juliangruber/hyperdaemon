@@ -8,13 +8,16 @@ const {
   shell,
   systemPreferences
 } = require('electron')
+const manager = require('hyperdrive-daemon/manager')
 const HyperdriveDaemon = require('hyperdrive-daemon')
 const setupFuse = require('./lib/setup-fuse')
 const { HyperdriveClient } = require('hyperdrive-daemon-client')
 const constants = require('hyperdrive-daemon-client/lib/constants')
-const { promises: fs } = require('fs')
 const Store = require('electron-store')
 const unhandled = require('electron-unhandled')
+const sleep = require('yoctodelay')
+const capitalize = require('capitalize')
+const debug = require('debug')('hyperdaemon')
 
 unhandled()
 
@@ -26,13 +29,12 @@ if (app.isPackaged && !app.requestSingleInstanceLock()) {
 let tray
 let daemon
 let client
-let daemonStatus = 'starting'
+let daemonStatus = 'off'
 let fuseEnabled = false
 const store = new Store()
 
 const openDrives = async () => {
-  const realPath = await fs.readlink(`${app.getPath('home')}/Hyperdrive`)
-  await shell.openExternal(`file://${realPath}`)
+  await shell.openExternal(`file://${app.getPath('home')}/Hyperdrive`)
 }
 
 const showHelp = async () => {
@@ -41,43 +43,69 @@ const showHelp = async () => {
   )
 }
 
-const setDaemonStatus = (status, { notify } = {}) => {
-  daemonStatus = status
-  updateTray()
-  if (notify) {
-    const n = new Notification({
-      title: 'Hyper Daemon',
-      body: `Daemon is ${daemonStatus}`,
-      silent: true
-    })
-    n.on('click', openDrives)
-    n.show()
-  }
-}
-
-const startDaemon = async () => {
-  setDaemonStatus('starting')
-  daemon = new HyperdriveDaemon({
-    storage: constants.root,
-    metadata: null
-  })
-  await daemon.start()
-
-  setDaemonStatus('connecting')
+const connect = async () => {
   client = new HyperdriveClient()
   await client.ready()
 
   const status = await client.status()
   if (status.fuseAvailable) fuseEnabled = true
 
-  setDaemonStatus('On', { notify: true })
+  setStatus('on')
 }
 
-const stopDaemon = async () => {
-  setDaemonStatus('stopping')
+const isRunning = async () => {
+  try {
+    await connect()
+    return true
+  } catch (_) {
+    setStatus('off')
+    return false
+  }
+}
+
+const setStatus = (status, { notify } = {}) => {
+  if (status !== daemonStatus) {
+    debug('status %s', status)
+  }
+  if (notify) {
+    const n = new Notification({
+      title: 'Hyper Daemon',
+      body: `Daemon is ${status}`,
+      silent: true
+    })
+    n.on('click', openDrives)
+    n.show()
+  }
+
+  daemonStatus = status
+  updateTray()
+}
+
+const start = async () => {
+  debug('start')
+  if (await isRunning()) return
+
+  setStatus('starting')
+  daemon = new HyperdriveDaemon({
+    storage: constants.root,
+    metadata: null
+  })
+  await daemon.start()
+  await connect()
+
+  setStatus('on', { notify: true })
+}
+
+const stop = async () => {
+  setStatus('stopping')
   client.close()
-  await daemon.stop()
-  setDaemonStatus('Off', { notify: true })
+  if (daemon) {
+    await daemon.stop()
+    daemon = null
+  } else {
+    await manager.stop()
+  }
+  setStatus('off', { notify: true })
 }
 
 const updateTray = () => {
@@ -85,28 +113,28 @@ const updateTray = () => {
   tray.setImage(getTrayImagePath())
   const template = [
     {
-      label: `Hyper Daemon: ${daemonStatus}`,
+      label: `Hyper Daemon: ${capitalize(daemonStatus)}`,
       enabled: false
     },
-    daemonStatus === 'On'
-      ? { label: 'Turn Daemon Off', click: stopDaemon }
-      : { label: 'Turn Daemon On', click: startDaemon }
+    daemonStatus === 'on'
+      ? { label: 'Turn Daemon Off', click: stop }
+      : { label: 'Turn Daemon On', click: start }
   ]
-  if (daemonStatus === 'On') {
+  if (daemonStatus === 'on') {
     template.push({ type: 'separator' })
     if (fuseEnabled) {
       template.push({ label: 'FUSE is enabled', enabled: false })
+      template.push({ label: 'Open Drives', click: openDrives })
     } else {
       template.push({
         label: 'Setup FUSE',
         click: async () => {
           await setupFuse()
-          stopDaemon()
-          startDaemon()
+          stop()
+          start()
         }
       })
     }
-    template.push({ label: 'Open Drives', click: openDrives })
   }
   template.push({ type: 'separator' })
   template.push({
@@ -129,7 +157,7 @@ const updateTray = () => {
 
 const getTrayImagePath = () => {
   const folder = systemPreferences.isDarkMode() ? 'dark' : 'light'
-  const file = daemonStatus === 'On' ? 'enabled' : 'disabled'
+  const file = daemonStatus === 'on' ? 'enabled' : 'disabled'
   return `${__dirname}/build/tray/${folder}/${file}@4x.png`
 }
 
@@ -153,7 +181,11 @@ process.once('SIGUSR2', async () => {
 })
 
 const main = async () => {
-  await startDaemon()
+  await start()
+  while (true) {
+    await sleep(1000)
+    await isRunning()
+  }
 }
 
 main().catch(err => {
