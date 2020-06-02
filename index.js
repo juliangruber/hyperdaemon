@@ -18,6 +18,7 @@ const Store = require('electron-store')
 const unhandled = require('electron-unhandled')
 const sleep = require('yoctodelay')
 const capitalize = require('capitalize')
+const debug = require('debug')('hyperdaemon')
 
 unhandled()
 
@@ -45,8 +46,11 @@ const showHelp = async () => {
 }
 
 const connect = async () => {
+  debug('connecting')
+
   client = new HyperdriveClient()
   await client.ready()
+  debug('client ready')
 
   const status = await client.status()
   if (status.fuseAvailable) fuseEnabled = true
@@ -55,6 +59,8 @@ const connect = async () => {
 }
 
 const isRunning = async () => {
+  debug('isRunning?')
+
   try {
     await connect()
     setStatus('on')
@@ -66,6 +72,8 @@ const isRunning = async () => {
 }
 
 const setStatus = (status, { notify } = {}) => {
+  debug('status %s', status)
+
   if (status !== daemonStatus) {
     console.log(status)
   }
@@ -84,6 +92,7 @@ const setStatus = (status, { notify } = {}) => {
 }
 
 const start = async () => {
+  debug('start')
   if (await isRunning()) return
 
   setStatus('starting')

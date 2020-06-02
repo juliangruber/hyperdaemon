@@ -13,7 +13,7 @@
     "test": "prettier-standard && standard"
   },
   "devDependencies": {
-    "electron": "^7.1.1",
+    "electron": "^9.0.1",
     "electron-builder": "^21.2.0",
     "nodemon": "^2.0.3",
     "np": "^6.2.1",
@@ -22,10 +22,11 @@
   },
   "dependencies": {
     "capitalize": "^2.0.3",
+    "debug": "^4.1.1",
     "electron-store": "^5.1.1",
     "electron-unhandled": "^3.0.2",
-    "hyperdrive-daemon": "^1.13.12",
-    "hyperdrive-daemon-client": "^1.15.1",
+    "hyperdrive-daemon": "^1.13.14",
+    "hyperdrive-daemon-client": "^1.15.2",
     "hyperdrive-fuse": "^1.2.15",
     "sudo-prompt": "^9.1.1",
     "yoctodelay": "^1.1.0"
