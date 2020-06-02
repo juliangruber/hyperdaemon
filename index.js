@@ -125,6 +125,7 @@ const updateTray = () => {
     template.push({ type: 'separator' })
     if (fuseEnabled) {
       template.push({ label: 'FUSE is enabled', enabled: false })
+      template.push({ label: 'Open Drives', click: openDrives })
     } else {
       template.push({
         label: 'Setup FUSE',
@@ -135,7 +136,6 @@ const updateTray = () => {
         }
       })
     }
-    template.push({ label: 'Open Drives', click: openDrives })
   }
   template.push({ type: 'separator' })
   template.push({
