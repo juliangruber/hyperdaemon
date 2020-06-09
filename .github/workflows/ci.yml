@@ -1,7 +1,13 @@
 name: CI
 on: push
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: npx standard
   build:
+    needs: lint
     strategy:
       matrix:
         os: [macos-latest]
@@ -26,14 +32,12 @@ jobs:
             ${{ runner.os }}-node-
       - name: npm install
         run: npm ci
-      - name: npm test
-        run: npm test
-      - name: prepare for app notarization
+      - name: Prepare for app notarization
         if: startsWith(matrix.os, 'macos')
         run: |
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
-      - name: build and release
+      - name: Build and release
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.GH_TOKEN }}
