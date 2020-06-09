@@ -42,8 +42,7 @@
       "extendInfo": {
         "LSUIElement": 1
       },
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false
+      "hardenedRuntime": true
     },
     "dmg": {
       "window": {
