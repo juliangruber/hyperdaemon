@@ -1,7 +1,13 @@
 name: CI
 on: push
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: npx standard
   build:
+    needs: lint
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest]
@@ -26,8 +32,6 @@ jobs:
             ${{ runner.os }}-node-
       - name: npm install
         run: npm ci
-      - name: npm test
-        run: npm test
       - name: build and release
         uses: samuelmeuli/action-electron-builder@v1
         with:
