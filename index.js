@@ -19,6 +19,7 @@ const sleep = require('yoctodelay')
 const capitalize = require('capitalize')
 const debug = require('debug')('hyperdaemon')
 const { autoUpdater } = require('electron-updater')
+const { version } = require('./package')
 
 unhandled()
 
@@ -151,6 +152,7 @@ const updateTray = () => {
     }
   })
   template.push({ type: 'separator' })
+  template.push({ label: `Version ${version}`, enabled: false })
   template.push({ label: 'Help', click: showHelp })
   template.push({ type: 'separator' })
   template.push({ label: 'Quit', click: () => app.quit() })
