@@ -18,6 +18,7 @@ const unhandled = require('electron-unhandled')
 const sleep = require('yoctodelay')
 const capitalize = require('capitalize')
 const debug = require('debug')('hyperdaemon')
+const { autoUpdater } = require('electron-updater')
 
 unhandled()
 
@@ -25,6 +26,8 @@ if (app.isPackaged && !app.requestSingleInstanceLock()) {
   app.quit()
   process.exit()
 }
+
+autoUpdater.checkForUpdatesAndNotify()
 
 let tray
 let daemon
