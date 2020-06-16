@@ -35,6 +35,7 @@ let daemon
 let client
 let daemonStatus = 'off'
 let fuseEnabled = false
+let holepunchable = false
 const store = new Store()
 
 const openDrives = async () => {
@@ -52,7 +53,8 @@ const connect = async () => {
   await client.ready()
 
   const status = await client.status()
-  if (status.fuseAvailable) fuseEnabled = true
+  fuseEnabled = status.fuseAvailable
+  holepunchable = status.holepunchable
 
   setStatus('on')
 }
@@ -126,6 +128,11 @@ const updateTray = () => {
   ]
   if (daemonStatus === 'on') {
     template.push({ type: 'separator' })
+    if (holepunchable) {
+      template.push({ label: 'Holepunching is enabled', enabled: false })
+    } else {
+      template.push({ label: 'Holepunching is disabled', enabled: false })
+    }
     if (fuseEnabled) {
       template.push({ label: 'FUSE is enabled', enabled: false })
       template.push({ label: 'Open Drives', click: openDrives })
