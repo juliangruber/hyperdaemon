@@ -38,7 +38,7 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
       - name: Build and release
-        uses: juliangruber/action-electron-builder@add/max-attempts
+        uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.GH_TOKEN }}
           mac_certs: ${{ secrets.mac_certs }}
