@@ -44,7 +44,7 @@ const openDrives = async () => {
 
 const showHelp = async () => {
   await shell.openExternal(
-    'https://github.com/libscie/hyperdaemon/blob/master/README.md#usage'
+    'https://github.com/libscie/hyperdaemon/blob/main/README.md#usage'
   )
 }
 
