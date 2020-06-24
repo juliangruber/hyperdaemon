@@ -21,6 +21,11 @@ const debug = require('debug')('hyperdaemon')
 const { autoUpdater } = require('electron-updater')
 const { version } = require('./package')
 
+let hyperfuse
+try {
+  hyperfuse = require('hyperfuse')
+} catch (_) {}
+
 unhandled()
 
 if (app.isPackaged && !app.requestSingleInstanceLock()) {
@@ -136,7 +141,7 @@ const updateTray = () => {
     if (fuseEnabled) {
       template.push({ label: 'FUSE is enabled', enabled: false })
       template.push({ label: 'Open Drives', click: openDrives })
-    } else {
+    } else if (hyperfuse) {
       template.push({
         label: 'Setup FUSE',
         click: async () => {
@@ -144,6 +149,11 @@ const updateTray = () => {
           stop()
           start()
         }
+      })
+    } else {
+      template.push({
+        label: 'FUSE is unavailable',
+        enabled: false
       })
     }
   }
@@ -174,7 +184,7 @@ const getTrayImagePath = () => {
 }
 
 app.on('ready', async () => {
-  app.dock.hide()
+  if (app.dock) app.dock.hide()
   tray = new Tray(getTrayImagePath())
   tray.setToolTip('This is my application.')
   updateTray()
@@ -184,7 +194,7 @@ app.on('ready', async () => {
     store.set('help-displayed', true)
   }
 })
-app.dock.hide()
+if (app.dock) app.dock.hide()
 
 process.once('SIGUSR2', async () => {
   if (client) client.close()
