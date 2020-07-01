@@ -24,7 +24,7 @@ jobs:
           echo "::set-output name=dir::$(npm config get cache)"
       - name: Cache node modules
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'windows')
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ${{ steps.npm-cache.outputs.dir }}
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
