@@ -19,7 +19,7 @@ const sleep = require('yoctodelay')
 const capitalize = require('capitalize')
 const debug = require('debug')('hyperdaemon')
 const { autoUpdater } = require('electron-updater')
-const { version } = require('./package')
+const { version, productName } = require('./package')
 
 let hyperfuse
 try {
@@ -186,7 +186,7 @@ const getTrayImagePath = () => {
 app.on('ready', async () => {
   if (app.dock) app.dock.hide()
   tray = new Tray(getTrayImagePath())
-  tray.setToolTip('This is my application.')
+  tray.setToolTip(productName)
   updateTray()
 
   if (!store.get('help-displayed')) {
