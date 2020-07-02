@@ -6,7 +6,7 @@ const {
   Tray,
   Notification,
   shell,
-  systemPreferences
+  nativeTheme
 } = require('electron')
 const manager = require('hyperdrive-daemon/manager')
 const HyperdriveDaemon = require('hyperdrive-daemon')
@@ -178,7 +178,7 @@ const updateTray = () => {
 }
 
 const getTrayImagePath = () => {
-  const folder = systemPreferences.isDarkMode() ? 'dark' : 'light'
+  const folder = nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
   const file = daemonStatus === 'on' ? 'enabled' : 'disabled'
   return `${__dirname}/build/tray/${folder}/${file}@4x.png`
 }
@@ -201,6 +201,8 @@ process.once('SIGUSR2', async () => {
   if (daemon) await daemon.stop()
   process.kill(process.pid, 'SIGUSR2')
 })
+
+nativeTheme.on('updated', updateTray)
 
 const main = async () => {
   await start()
