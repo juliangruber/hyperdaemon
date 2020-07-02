@@ -84,7 +84,7 @@ const setStatus = (status, { notify } = {}) => {
       body: `Daemon is ${status}`,
       silent: true
     })
-    n.on('click', openDrives)
+    if (hyperfuse) n.on('click', openDrives)
     n.show()
   }
 
